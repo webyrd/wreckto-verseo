@@ -42,10 +42,10 @@
 (define head-valueo
   (lambda (hnf)
     (conde
-      ((integerso hnf))
+      ((integero hnf))
       ((primopo hnf))
       ((tupleo hnf))
-      ((fresh ()
+      ((fresh (x e)
          (== `(lambda (,x) ,e) hnf)
          (symbolo x)
          (expressiono e))))))
@@ -54,7 +54,7 @@
   (lambda (t)
     (fresh (v*)
       (== `(tuple . ,v*) t)
-      (list-of-valueo v*))))
+      (list-of-valueso v*))))
 
 (define list-of-valueso
   (lambda (v*)
