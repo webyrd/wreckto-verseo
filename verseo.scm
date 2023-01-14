@@ -30,7 +30,15 @@
   (lambda (expr)
     (conde
       ((valueo expr))
-      ;; TODO add remaining expr cases
+      ;; TODO implement these cases:
+      ;; ((appo expr))
+      ;; ((equalo expr))
+      ;; ((seqo expr))
+      ;; ((existo expr))
+      ;; ((alternateo expr))
+      ;; ((failo expr))
+      ;; ((oneo expr))
+      ;; ((allo expr))
       )))
 
 (define valueo
@@ -45,16 +53,20 @@
       ((integero hnf))
       ((primopo hnf))
       ((tupleo hnf))
-      ((fresh (x e)
-         (== `(lambda (,x) ,e) hnf)
-         (symbolo x)
-         (expressiono e))))))
+      ((lambdao hnf)))))
 
 (define tupleo
-  (lambda (t)
+  (lambda (hnf)
     (fresh (v*)
-      (== `(tuple . ,v*) t)
+      (== `(tuple . ,v*) hnf)
       (list-of-valueso v*))))
+
+(define lambdao
+  (lambda (hnf)
+    (fresh (x e)
+      (== `(lambda (,x) ,e) hnf)
+      (symbolo x)
+      (expressiono e))))
 
 (define list-of-valueso
   (lambda (v*)
