@@ -42,11 +42,26 @@
     (conde
       ((integerso hnf))
       ((primopo hnf))
-      ;; TODO: <v1, ..., vn>
+      ((tupleo hnf))
       ((fresh ()
          (== `(lambda (,x) ,e) hnf)
          (symbolo x)
          (expressiono e))))))
+
+(define tupleo
+  (lambda (t)
+    (fresh (v*)
+      (== `(tuple . ,v*) t)
+      (list-of-valueo v*))))
+
+(define list-of-valueso
+  (lambda (v*)
+    (conde
+      ((== '() v*))
+      ((fresh (v v-rest)
+         (== `(,v . ,v-rest) v*)
+         (valueo v)
+         (list-of-valueso v-rest))))))
 
 (define primopo
   (lambda (op)
