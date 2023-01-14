@@ -28,8 +28,10 @@
 
 (define expressiono
   (lambda (expr)
-    'TODO
-    ))
+    (conde
+      ((valueo expr))
+      ;; TODO add remaining expr cases
+      )))
 
 (define valueo
   (lambda (v)
