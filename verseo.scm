@@ -47,51 +47,54 @@
 
 (define appo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (v1 v2)
+      (== `(app ,v1 ,v2) expr)
+      (valueo v1)
+      (valueo v2))))
 
 (define equalo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (e1 e2)
+      (== `(= ,e1 ,e2) expr)
+      (expressiono e1)
+      (expressiono e2))))
 
 (define seqo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (e1 e2)
+      (== `(seq ,e1 ,e2) expr)
+      (expressiono e1)
+      (expressiono e2))))
 
 (define existo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (x e)
+      (== `(exist (,x) ,e) expr)
+      (symbolo x)
+      (expressiono e))))
 
 (define alternateo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (e1 e2)
+      (== `(alt ,e1 ,e2) expr)
+      (expressiono e1)
+      (expressiono e2))))
 
 (define failo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (== 'fail expr)))
 
 (define oneo
   (lambda (expr)
     (fresh (e)
-      (== `(one ,e) prog)
+      (== `(one ,e) expr)
       (expressiono e))))
 
 (define allo
   (lambda (expr)
-    (fresh ()
-      'TODO
-      )))
+    (fresh (e)
+      (== `(all ,e) expr)
+      (expressiono e))))
 
 (define head-valueo
   (lambda (hnf)
