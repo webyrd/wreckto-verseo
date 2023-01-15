@@ -30,22 +30,68 @@
   (lambda (expr)
     (conde
       ((valueo expr))
-      ;; TODO implement these cases:
-      ;; ((appo expr))
-      ;; ((equalo expr))
-      ;; ((seqo expr))
-      ;; ((existo expr))
-      ;; ((alternateo expr))
-      ;; ((failo expr))
-      ;; ((oneo expr))
-      ;; ((allo expr))
-      )))
+      ((appo expr))
+      ((equalo expr))
+      ((seqo expr))
+      ((existo expr))
+      ((alternateo expr))
+      ((failo expr))
+      ((oneo expr))
+      ((allo expr)))))
 
 (define valueo
   (lambda (v)
     (conde
       ((variableo v))
       ((head-valueo v)))))
+
+(define appo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define equalo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define seqo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define existo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define alternateo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define failo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
+
+(define oneo
+  (lambda (expr)
+    (fresh (e)
+      (== `(one ,e) prog)
+      (expressiono e))))
+
+(define allo
+  (lambda (expr)
+    (fresh ()
+      'TODO
+      )))
 
 (define head-valueo
   (lambda (hnf)
