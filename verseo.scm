@@ -11,123 +11,125 @@
 
 ;; Grammar from fig 1 on page 3
 
-(define integero
-  (lambda (k)
-    (numbero k)))
-
-(define variableo
-  (lambda (x)
-    (symbolo x)))
+;; TODO fix use of 'bound-vars' to include variable reference
+;; and the introduction of bound variables (lambda and exist)
 
 (define programo
   (lambda (prog)
     (fresh (e)
-      ;; TODO ensure fvs(e) is empty
       (== `(one ,e) prog)
-      (expressiono e))))
+      (expressiono e '()))))
 
 (define expressiono
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (conde
-      ((valueo expr))
-      ((appo expr))
-      ((equalo expr))
-      ((seqo expr))
-      ((existo expr))
-      ((alternateo expr))
-      ((failo expr))
-      ((oneo expr))
-      ((allo expr)))))
+      ((valueo expr bound-vars))
+      ((appo expr bound-vars))
+      ((equalo expr bound-vars))
+      ((seqo expr bound-vars))
+      ((existo expr bound-vars))
+      ((alternateo expr bound-vars))
+      ((failo expr bound-vars))
+      ((oneo expr bound-vars))
+      ((allo expr bound-vars)))))
 
 (define valueo
-  (lambda (v)
+  (lambda (v bound-vars)
     (conde
-      ((variableo v))
-      ((head-valueo v)))))
+      ((variableo v bound-vars))
+      ((head-valueo v bound-vars)))))
+
+(define variableo
+  (lambda (x bound-vars)
+    (symbolo x)))
 
 (define appo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (v1 v2)
       (== `(app ,v1 ,v2) expr)
-      (valueo v1)
-      (valueo v2))))
+      (valueo v1 bound-vars)
+      (valueo v2 bound-vars))))
 
 (define equalo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (e1 e2)
       (== `(= ,e1 ,e2) expr)
-      (expressiono e1)
-      (expressiono e2))))
+      (expressiono e1 bound-vars)
+      (expressiono e2 bound-vars))))
 
 (define seqo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (e1 e2)
       (== `(seq ,e1 ,e2) expr)
-      (expressiono e1)
-      (expressiono e2))))
+      (expressiono e1 bound-vars)
+      (expressiono e2 bound-vars))))
 
 (define existo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (x e)
       (== `(exist (,x) ,e) expr)
       (symbolo x)
-      (expressiono e))))
+      (expressiono e bound-vars))))
 
 (define alternateo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (e1 e2)
       (== `(alt ,e1 ,e2) expr)
-      (expressiono e1)
-      (expressiono e2))))
+      (expressiono e1 bound-vars)
+      (expressiono e2 bound-vars))))
 
 (define failo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (== 'fail expr)))
 
 (define oneo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (e)
       (== `(one ,e) expr)
-      (expressiono e))))
+      (expressiono e bound-vars))))
 
 (define allo
-  (lambda (expr)
+  (lambda (expr bound-vars)
     (fresh (e)
       (== `(all ,e) expr)
-      (expressiono e))))
+      (expressiono e bound-vars))))
 
 (define head-valueo
-  (lambda (hnf)
+  (lambda (hnf bound-vars)
     (conde
-      ((integero hnf))
-      ((primopo hnf))
-      ((tupleo hnf))
-      ((lambdao hnf)))))
+      ((integero hnf bound-vars))
+      ((primopo hnf bound-vars))
+      ((tupleo hnf bound-vars))
+      ((lambdao hnf bound-vars)))))
+
+(define integero
+  (lambda (k bound-vars)
+    (numbero k)))
 
 (define tupleo
-  (lambda (hnf)
+  (lambda (hnf bound-vars)
     (fresh (v*)
       (== `(tuple . ,v*) hnf)
-      (list-of-valueso v*))))
+      (list-of-valueso v* bound-vars))))
 
 (define lambdao
-  (lambda (hnf)
+  (lambda (hnf bound-vars)
     (fresh (x e)
       (== `(lambda (,x) ,e) hnf)
       (symbolo x)
-      (expressiono e))))
+      (expressiono e bound-vars))))
 
 (define list-of-valueso
-  (lambda (v*)
+  (lambda (v* bound-vars)
     (conde
       ((== '() v*))
       ((fresh (v v-rest)
          (== `(,v . ,v-rest) v*)
-         (valueo v)
-         (list-of-valueso v-rest))))))
+         (valueo v bound-vars)
+         (list-of-valueso v-rest bound-vars))))))
 
 (define primopo
-  (lambda (op)
+  (lambda (op bound-vars)
     (conde
       ((== 'gt op))
       ((== 'add op)))))
