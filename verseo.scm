@@ -9,7 +9,7 @@
     ))
 
 
-;; Grammar from fig 1 on page 3
+;; Grammar from fig 1 on page 3 of the preprint of 'The Verse Calculus: a Core Calculus for Functional Logic Programming' by Augustsson, Breitner, Claessen, Peyton Jones, and Sweeney.
 
 (define programo
   (lambda (prog)
