@@ -11,9 +11,6 @@
 
 ;; Grammar from fig 1 on page 3
 
-;; TODO fix use of 'bound-vars' to include variable reference
-;; and the introduction of bound variables (lambda and exist)
-
 (define programo
   (lambda (prog)
     (fresh (e)
@@ -41,7 +38,18 @@
 
 (define variableo
   (lambda (x bound-vars)
-    (symbolo x)))
+    (fresh ()
+      (symbolo x)
+      (bound-vars-lookupo x bound-vars))))
+
+(define bound-vars-lookupo
+  (lambda (x bound-vars)
+    (fresh (y rest)
+      (== `(,y . ,rest) bound-vars)
+      (conde
+        ((== x y))
+        ((=/= x y)
+         (bound-vars-lookupo x rest))))))
 
 (define appo
   (lambda (expr bound-vars)
@@ -69,7 +77,7 @@
     (fresh (x e)
       (== `(exist (,x) ,e) expr)
       (symbolo x)
-      (expressiono e bound-vars))))
+      (expressiono e `(,x . ,bound-vars)))))
 
 (define alternateo
   (lambda (expr bound-vars)
@@ -117,7 +125,7 @@
     (fresh (x e)
       (== `(lambda (,x) ,e) hnf)
       (symbolo x)
-      (expressiono e bound-vars))))
+      (expressiono e `(,x . ,bound-vars)))))
 
 (define list-of-valueso
   (lambda (v* bound-vars)
