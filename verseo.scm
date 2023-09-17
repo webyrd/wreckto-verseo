@@ -37,6 +37,8 @@ Head values  hnf ::= k | op | `(tuple ,v1 ... ,vn) | `(lam ,x ,e)
 Primops       op ::= 'gt | 'add
 |#
 
+;; Free variables in an expression.
+;; `(lam ,x ,e) and `(exists ,x ,e) are the only binders.
 (define (fvs-expressiono expr env fvs fvs^)
   (conde
     ((== 'fail expr)
