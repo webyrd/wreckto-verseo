@@ -23,7 +23,7 @@
     ))
 
 
-;; Grammar from Fig. 1. (VC: Syntax) on page 3
+;; S-expression version of grammar from Fig. 1. (VC: Syntax) on page 3
 
 #|
 Integers     k (<numbero>)
