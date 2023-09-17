@@ -108,7 +108,7 @@ Primops       op ::= 'gt | 'add
        (fvs-valueo v env fvs fvs^^)
        (fvs-tuple-valueso v-rest env fvs^^ fvs^)))))
 
-
+;; Grammer/parsing relations
 (define programo
   (lambda (prog)
     (fresh (e)
