@@ -23,7 +23,34 @@
   (absento x ls))
 
 (define (fvs-expressiono expr env fvs fvs^)
-  'TODO)
+  (conde
+    ((== 'fail expr)
+     (== fvs fvs^)) ;; fail
+    ((fvs-valueo expr env fvs fvs^)) ;; v
+    ((fresh (e) ;; one{e}
+       (== `(one ,e) expr)
+       (fvs-expressiono e env fvs fvs^)))
+    ((fresh (e) ;; all{e}
+       (== `(all ,e) expr)
+       (fvs-expressiono e env fvs fvs^)))
+    ((fresh (x e) ;; exists x.e
+       (== `(exists ,x ,e) expr)
+       (symbolo x)
+       (fvs-expressiono e env fvs fvs^)))    
+    ((fresh (eq e fvs^^) ;; eq; e
+       (== `(seq ,eq ,e) expr)
+       (fvs-eqo eq env fvs fvs^^)
+       (fvs-expressiono e env fvs^^ fvs^)))
+    ((fresh (e1 e2 fvs^^) ;; e1 | e2
+       (== `(choice ,e1 ,e2) expr)
+       (fvs-expressiono e1 env fvs fvs^^)
+       (fvs-expressiono e2 env fvs^^ fvs^)))
+    ((fresh (v1 v2 fvs^^) ;; v1 v2
+       ;; is this an application?
+       (== `(app ,v1 ,v2) expr)
+       (fvs-valueo v1 env fvs fvs^^)
+       (fvs-valueo v2 env fvs^^ fvs^)))
+    ))
 
 (define (fvs-eqo eq-expr env fvs fvs^)
   (conde
