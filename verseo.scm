@@ -71,7 +71,7 @@
   (lambda (prog)
     (fresh (e)
       (== `(one ,e) prog)
-      (fvso e '())
+      (fvs-expressiono e '() '() '())
       (expressiono e '()))))
 
 (define expressiono
