@@ -1,15 +1,7 @@
 (load "faster-miniKanren/mk-vicare.scm")
 (load "faster-miniKanren/mk.scm")
 
- ;; should prolly use CLP(SMT) for arithmetic
-
-(define verseo
-  (lambda ()
-    'TODO
-    ))
-
-
-;; Grammar from Fig. 1. (VC: Syntax) on page 3
+;; Helpers
 
 (define (membero x ls)
   (fresh (y rest)
@@ -21,6 +13,29 @@
 
 (define (not-membero x ls)
   (absento x ls))
+
+
+ ;; should prolly use CLP(SMT) for arithmetic
+
+(define verseo
+  (lambda ()
+    'TODO
+    ))
+
+
+;; Grammar from Fig. 1. (VC: Syntax) on page 3
+
+#|
+Integers     k (<numbero>)
+Variables    x, y, z, f, g (<symbolo>)
+Programs       p ::= `(one ,e) where (fvs-expressiono e '() '() '()) succeeds
+Expressions    e ::= v | `(seq ,eq ,e) | `(exists ,x ,e) | 'fail |
+                     `(choice ,e1 ,e2) | `(app ,v1 ,v2) | `(one ,e) | `(all ,e)
+              eq ::= e | `(= ,v ,e)
+Values         v ::= x | hnf
+Head values  hnf ::= k | op | `(vec ,v1 ... ,vn) | `(lam ,x ,e)
+Primops       op ::= 'gt | 'add
+|#
 
 (define (fvs-expressiono expr env fvs fvs^)
   (conde
