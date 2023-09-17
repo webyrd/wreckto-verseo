@@ -39,53 +39,53 @@ Primops       op ::= 'gt | 'add
 
 ;; Free variables in an expression.
 ;; `(lam ,x ,e) and `(exists ,x ,e) are the only binders.
-(define (fvs-expressiono expr env fvs fvs^)
+(define (fvs-expressiono expr bound-vars fvs fvs^)
   (conde
     ((== 'fail expr)
      (== fvs fvs^)) ;; fail
-    ((fvs-valueo expr env fvs fvs^)) ;; v
+    ((fvs-valueo expr bound-vars fvs fvs^)) ;; v
     ((fresh (e) ;; one{e}
        (== `(one ,e) expr)
-       (fvs-expressiono e env fvs fvs^)))
+       (fvs-expressiono e bound-vars fvs fvs^)))
     ((fresh (e) ;; all{e}
        (== `(all ,e) expr)
-       (fvs-expressiono e env fvs fvs^)))
+       (fvs-expressiono e bound-vars fvs fvs^)))
     ((fresh (x e) ;; exists x.e
        (== `(exists ,x ,e) expr)
        (symbolo x)
-       (fvs-expressiono e env fvs fvs^)))    
+       (fvs-expressiono e bound-vars fvs fvs^)))    
     ((fresh (eq e fvs^^) ;; eq; e
        (== `(seq ,eq ,e) expr)
-       (fvs-eqo eq env fvs fvs^^)
-       (fvs-expressiono e env fvs^^ fvs^)))
+       (fvs-eqo eq bound-vars fvs fvs^^)
+       (fvs-expressiono e bound-vars fvs^^ fvs^)))
     ((fresh (e1 e2 fvs^^) ;; e1 | e2
        (== `(choice ,e1 ,e2) expr)
-       (fvs-expressiono e1 env fvs fvs^^)
-       (fvs-expressiono e2 env fvs^^ fvs^)))
+       (fvs-expressiono e1 bound-vars fvs fvs^^)
+       (fvs-expressiono e2 bound-vars fvs^^ fvs^)))
     ((fresh (v1 v2 fvs^^) ;; v1 v2
        (== `(app ,v1 ,v2) expr)
-       (fvs-valueo v1 env fvs fvs^^)
-       (fvs-valueo v2 env fvs^^ fvs^)))))
+       (fvs-valueo v1 bound-vars fvs fvs^^)
+       (fvs-valueo v2 bound-vars fvs^^ fvs^)))))
 
-(define (fvs-eqo eq-expr env fvs fvs^)
+(define (fvs-eqo eq-expr bound-vars fvs fvs^)
   (conde
-    ((fvs-expressiono eq-expr env fvs fvs^))
+    ((fvs-expressiono eq-expr bound-vars fvs fvs^))
     ((fresh (v e fvs^^)
        (== `(= ,v ,e) eq-expr)
-       (fvs-valueo v env fvs fvs^^)
-       (fvs-expressiono e env fvs^^ fvs^)))))
+       (fvs-valueo v bound-vars fvs fvs^^)
+       (fvs-expressiono e bound-vars fvs^^ fvs^)))))
 
-(define (fvs-valueo value env fvs fvs^)
+(define (fvs-valueo value bound-vars fvs fvs^)
   (conde
     ((symbolo value)
      (conde
        ((== fvs fvs^)
-        (membero value env))
+        (membero value bound-vars))
        ((== `(,value . ,fvs) fvs^)
-        (not-membero value env))))
-    ((fvs-head-valueo value env fvs fvs^))))
+        (not-membero value bound-vars))))
+    ((fvs-head-valueo value bound-vars fvs fvs^))))
 
-(define (fvs-head-valueo head-value env fvs fvs^)
+(define (fvs-head-valueo head-value bound-vars fvs fvs^)
   (conde
     ((== fvs fvs^)
      (conde
@@ -94,19 +94,19 @@ Primops       op ::= 'gt | 'add
        ((== 'add head-value))))
     ((fresh (v*)
        (== `(tuple . ,v*) head-value)
-       (fvs-tuple-valueso v* env fvs fvs^)))
+       (fvs-tuple-valueso v* bound-vars fvs fvs^)))
     ((fresh (x e)
        (== `(lam ,x ,e) head-value)
        (symbolo x)
-       (fvs-expressiono e `(,x . ,env) fvs fvs^)))))
+       (fvs-expressiono e `(,x . ,bound-vars) fvs fvs^)))))
 
-(define (fvs-tuple-valueso v* env fvs fvs^)
+(define (fvs-tuple-valueso v* bound-vars fvs fvs^)
   (conde
     ((== '() v*) (== fvs fvs^))
     ((fresh (v v-rest fvs^^)
        (== `(,v . ,v-rest) v*)
-       (fvs-valueo v env fvs fvs^^)
-       (fvs-tuple-valueso v-rest env fvs^^ fvs^)))))
+       (fvs-valueo v bound-vars fvs fvs^^)
+       (fvs-tuple-valueso v-rest bound-vars fvs^^ fvs^)))))
 
 ;; Grammer/parsing relations
 (define programo
