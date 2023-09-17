@@ -81,7 +81,7 @@
        (== `(vec . ,v*) head-value)
        (fvs-vec-valueso v* env fvs fvs^)))
     ((fresh (x e)
-       (== `(lam ,x . ,e) head-value)
+       (== `(lam ,x ,e) head-value)
        (symbolo x)
        (fvs-expressiono e `(,x . ,env) fvs fvs^)))))
 
