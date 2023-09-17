@@ -9,12 +9,69 @@
     ))
 
 
-;; Grammar from Fig. 1. (The Verse calculus: syntax) on page 3 of the preprint of 'The Verse Calculus: a Core Calculus for Functional Logic Programming' by Augustsson, Breitner, Claessen, Peyton Jones, and Sweeney.
+;; Grammar from Fig. 1. (VC: Syntax) on page 3
+
+(define (membero x ls)
+  (fresh (y rest)
+    (== `(,y . ,rest) ls)
+    (conde
+      ((== x y))
+      ((=/= x y)
+       (membero x rest)))))
+
+(define (not-membero x ls)
+  (absento x ls))
+
+(define (fvs-expressiono expr env fvs fvs^)
+  'TODO)
+
+(define (fvs-eqo eq-expr env fvs fvs^)
+  (conde
+    ((fvs-expressiono eq-expr env fvs fvs^))
+    ((fresh (v e fvs^^)
+       (== `(= ,v ,e) eq-expr)
+       (fvs-valueo v env fvs fvs^^)
+       (fvs-expressiono e env fvs^^ fvs^)))))
+
+(define (fvs-valueo value env fvs fvs^)
+  (conde
+    ((symbolo value)
+     (conde
+       ((== fvs fvs^)
+        (membero value env))
+       ((== `(,value . ,fvs) fvs^)
+        (not-membero value env))))
+    ((fvs-head-valueo value env fvs fvs^))))
+
+(define (fvs-head-valueo head-value env fvs fvs^)
+  (conde
+    ((== fvs fvs^)
+     (conde
+       ((numbero head-value))
+       ((== 'gt head-value))
+       ((== 'add head-value))))
+    ((fresh (v*)
+       (== `(vec . ,v*) head-value)
+       (fvs-vec-valueso v* env fvs fvs^)))
+    ((fresh (x e)
+       (== `(lam ,x . ,e) head-value)
+       (symbolo x)
+       (fvs-expressiono e `(,x . ,env) fvs fvs^)))))
+
+(define (fvs-vec-valueso v* env fvs fvs^)
+  (conde
+    ((== '() v*) (== fvs fvs^))
+    ((fresh (v v-rest fvs^^)
+       (== `(,v . ,v-rest) v*)
+       (fvs-valueo v env fvs fvs^^)
+       (fvs-vec-valueso v-rest env fvs^^ fvs^)))))
+
 
 (define programo
   (lambda (prog)
     (fresh (e)
       (== `(one ,e) prog)
+      (fvso e '())
       (expressiono e '()))))
 
 (define expressiono
