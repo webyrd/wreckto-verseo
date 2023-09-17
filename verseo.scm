@@ -33,7 +33,7 @@ Expressions    e ::= v | `(seq ,eq ,e) | `(exists ,x ,e) | 'fail |
                      `(choice ,e1 ,e2) | `(app ,v1 ,v2) | `(one ,e) | `(all ,e)
               eq ::= e | `(= ,v ,e)
 Values         v ::= x | hnf
-Head values  hnf ::= k | op | `(vec ,v1 ... ,vn) | `(lam ,x ,e)
+Head values  hnf ::= k | op | `(tuple ,v1 ... ,vn) | `(lam ,x ,e)
 Primops       op ::= 'gt | 'add
 |#
 
@@ -61,11 +61,9 @@ Primops       op ::= 'gt | 'add
        (fvs-expressiono e1 env fvs fvs^^)
        (fvs-expressiono e2 env fvs^^ fvs^)))
     ((fresh (v1 v2 fvs^^) ;; v1 v2
-       ;; is this an application?
        (== `(app ,v1 ,v2) expr)
        (fvs-valueo v1 env fvs fvs^^)
-       (fvs-valueo v2 env fvs^^ fvs^)))
-    ))
+       (fvs-valueo v2 env fvs^^ fvs^)))))
 
 (define (fvs-eqo eq-expr env fvs fvs^)
   (conde
@@ -93,20 +91,20 @@ Primops       op ::= 'gt | 'add
        ((== 'gt head-value))
        ((== 'add head-value))))
     ((fresh (v*)
-       (== `(vec . ,v*) head-value)
-       (fvs-vec-valueso v* env fvs fvs^)))
+       (== `(tuple . ,v*) head-value)
+       (fvs-tuple-valueso v* env fvs fvs^)))
     ((fresh (x e)
        (== `(lam ,x ,e) head-value)
        (symbolo x)
        (fvs-expressiono e `(,x . ,env) fvs fvs^)))))
 
-(define (fvs-vec-valueso v* env fvs fvs^)
+(define (fvs-tuple-valueso v* env fvs fvs^)
   (conde
     ((== '() v*) (== fvs fvs^))
     ((fresh (v v-rest fvs^^)
        (== `(,v . ,v-rest) v*)
        (fvs-valueo v env fvs fvs^^)
-       (fvs-vec-valueso v-rest env fvs^^ fvs^)))))
+       (fvs-tuple-valueso v-rest env fvs^^ fvs^)))))
 
 
 (define programo
@@ -174,14 +172,14 @@ Primops       op ::= 'gt | 'add
 (define existo
   (lambda (expr bound-vars)
     (fresh (x e)
-      (== `(exist (,x) ,e) expr)
+      (== `(exist ,x ,e) expr)
       (symbolo x)
       (expressiono e `(,x . ,bound-vars)))))
 
 (define alternateo
   (lambda (expr bound-vars)
     (fresh (e1 e2)
-      (== `(alt ,e1 ,e2) expr)
+      (== `(choice ,e1 ,e2) expr)
       (expressiono e1 bound-vars)
       (expressiono e2 bound-vars))))
 
@@ -216,13 +214,13 @@ Primops       op ::= 'gt | 'add
 (define tupleo
   (lambda (hnf bound-vars)
     (fresh (v*)
-      (== `(tuple . ,v*) hnf)
+      (== `(tup . ,v*) hnf)
       (list-of-valueso v* bound-vars))))
 
 (define lambdao
   (lambda (hnf bound-vars)
     (fresh (x e)
-      (== `(lambda (,x) ,e) hnf)
+      (== `(lam ,x ,e) hnf)
       (symbolo x)
       (expressiono e `(,x . ,bound-vars)))))
 
